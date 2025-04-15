@@ -24,7 +24,7 @@ Domain-Review: Christophe ROULLIER <christophe.roullier@foss.st.com>
 
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7738,8 +7738,11 @@ int stmmac_suspend(struct device *dev)
+@@ -7768,8 +7768,11 @@ int stmmac_suspend(struct device *dev)
  	struct stmmac_priv *priv = netdev_priv(ndev);
  	u32 chan;
  
@@ -37,7 +37,7 @@ Domain-Review: Christophe ROULLIER <christophe.roullier@foss.st.com>
  
  	mutex_lock(&priv->lock);
  
-@@ -7846,8 +7849,11 @@ int stmmac_resume(struct device *dev)
+@@ -7876,8 +7879,11 @@ int stmmac_resume(struct device *dev)
  	struct stmmac_priv *priv = netdev_priv(ndev);
  	int ret;
  

@@ -19,7 +19,7 @@ Reviewed-on: https://gerrit.st.com/c/mpu/oe/st/linux-stm32/+/404470
 
 --- a/drivers/ptp/ptp_chardev.c
 +++ b/drivers/ptp/ptp_chardev.c
-@@ -139,11 +139,7 @@ long ptp_ioctl(struct posix_clock *pc, u
+@@ -143,11 +143,7 @@ long ptp_ioctl(struct posix_clock *pc, u
  		caps.pps = ptp->info->pps;
  		caps.n_pins = ptp->info->n_pins;
  		caps.cross_timestamping = ptp->info->getcrosststamp != NULL;

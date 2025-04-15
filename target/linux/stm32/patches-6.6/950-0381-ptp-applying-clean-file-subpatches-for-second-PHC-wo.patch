@@ -26,7 +26,7 @@ Reviewed-by: Eric FOURMONT <eric.fourmont-ext@st.com>
 
 --- a/drivers/ptp/ptp_chardev.c
 +++ b/drivers/ptp/ptp_chardev.c
-@@ -112,6 +112,8 @@ long ptp_ioctl(struct posix_clock *pc, u
+@@ -113,6 +113,8 @@ long ptp_ioctl(struct posix_clock *pc, u
  	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
  	struct ptp_sys_offset_extended *extoff = NULL;
  	struct ptp_sys_offset_precise precise_offset;
@@ -35,7 +35,7 @@ Reviewed-by: Eric FOURMONT <eric.fourmont-ext@st.com>
  	struct system_device_crosststamp xtstamp;
  	struct ptp_clock_info *ops = ptp->info;
  	struct ptp_sys_offset *sysoff = NULL;
-@@ -139,6 +141,7 @@ long ptp_ioctl(struct posix_clock *pc, u
+@@ -143,6 +145,7 @@ long ptp_ioctl(struct posix_clock *pc, u
  		caps.cross_timestamping = ptp->info->getcrosststamp != NULL;
  		caps.adjust_phase = ptp->info->adjphase != NULL &&
  				    ptp->info->getmaxphase != NULL;
@@ -43,7 +43,7 @@ Reviewed-by: Eric FOURMONT <eric.fourmont-ext@st.com>
  		if (caps.adjust_phase)
  			caps.max_phase_adj = ptp->info->getmaxphase(ptp->info);
  		if (copy_to_user((void __user *)arg, &caps, sizeof(caps)))
-@@ -325,6 +328,26 @@ long ptp_ioctl(struct posix_clock *pc, u
+@@ -329,6 +332,26 @@ long ptp_ioctl(struct posix_clock *pc, u
  			err = -EFAULT;
  		break;
  
@@ -72,7 +72,7 @@ Reviewed-by: Eric FOURMONT <eric.fourmont-ext@st.com>
  		sysoff = memdup_user((void __user *)arg, sizeof(*sysoff));
 --- a/drivers/ptp/ptp_clock.c
 +++ b/drivers/ptp/ptp_clock.c
-@@ -228,6 +228,7 @@ struct ptp_clock *ptp_clock_register(str
+@@ -233,6 +233,7 @@ struct ptp_clock *ptp_clock_register(str
  
  	ptp->clock.ops = ptp_clock_ops;
  	ptp->info = info;
@@ -80,7 +80,7 @@ Reviewed-by: Eric FOURMONT <eric.fourmont-ext@st.com>
  	ptp->devid = MKDEV(major, index);
  	ptp->index = index;
  	spin_lock_init(&ptp->tsevq.lock);
-@@ -351,6 +352,25 @@ static int unregister_vclock(struct devi
+@@ -359,6 +360,25 @@ static int unregister_vclock(struct devi
  	return 0;
  }
  

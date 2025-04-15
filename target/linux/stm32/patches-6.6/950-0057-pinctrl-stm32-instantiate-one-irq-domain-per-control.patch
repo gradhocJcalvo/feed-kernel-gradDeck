@@ -21,12 +21,12 @@ error.
 Signed-off-by: Antonio Borneo <antonio.borneo@foss.st.com>
 Change-Id: I23c4e676146289fe957970986a3ef6907740ba10
 ---
- drivers/pinctrl/stm32/pinctrl-stm32.c | 148 +++++++++++++++++++-------
- 1 file changed, 111 insertions(+), 37 deletions(-)
+ drivers/pinctrl/stm32/pinctrl-stm32.c | 146 ++++++++++++++++++++------
+ 1 file changed, 111 insertions(+), 35 deletions(-)
 
 --- a/drivers/pinctrl/stm32/pinctrl-stm32.c
 +++ b/drivers/pinctrl/stm32/pinctrl-stm32.c
-@@ -141,12 +141,11 @@ struct stm32_gpio_bank {
+@@ -140,12 +140,11 @@ struct stm32_gpio_bank {
  	spinlock_t lock;
  	struct gpio_chip gpio_chip;
  	struct pinctrl_gpio_range range;
@@ -238,7 +238,7 @@ Change-Id: I23c4e676146289fe957970986a3ef6907740ba10
  	.translate	= stm32_gpio_domain_translate,
  	.alloc		= stm32_gpio_domain_alloc,
  	.free		= stm32_gpio_domain_free,
-@@ -1703,20 +1769,6 @@ static int stm32_gpiolib_register_bank(s
+@@ -1697,18 +1763,6 @@ static int stm32_gpiolib_register_bank(s
  	bank->rif_control = pctl->match_data->rif_control;
  	spin_lock_init(&bank->lock);
  
@@ -250,17 +250,15 @@ Change-Id: I23c4e676146289fe957970986a3ef6907740ba10
 -							   bank->fwnode, &stm32_gpio_domain_ops,
 -							   bank);
 -
--		if (!bank->domain) {
--			err = -ENODEV;
--			goto err_clk;
--		}
+-		if (!bank->domain)
+-			return -ENODEV;
 -	}
 -
  	names = devm_kcalloc(dev, npins, sizeof(char *), GFP_KERNEL);
- 	if (!names) {
- 		err = -ENOMEM;
-@@ -1752,11 +1804,19 @@ err_clk:
- 	return err;
+ 	if (!names)
+ 		return -ENOMEM;
+@@ -1736,11 +1790,19 @@ static int stm32_gpiolib_register_bank(s
+ 	return 0;
  }
  
 -static struct irq_domain *stm32_pctrl_get_irq_domain(struct platform_device *pdev)
@@ -282,7 +280,7 @@ Change-Id: I23c4e676146289fe957970986a3ef6907740ba10
  
  	if (!of_property_present(np, "interrupt-parent"))
  		return NULL;
-@@ -1765,12 +1825,25 @@ static struct irq_domain *stm32_pctrl_ge
+@@ -1749,12 +1811,25 @@ static struct irq_domain *stm32_pctrl_ge
  	if (!parent)
  		return ERR_PTR(-ENXIO);
  
@@ -310,7 +308,7 @@ Change-Id: I23c4e676146289fe957970986a3ef6907740ba10
  	return domain;
  }
  
-@@ -1890,8 +1963,10 @@ int stm32_pctl_probe(struct platform_dev
+@@ -1874,8 +1949,10 @@ int stm32_pctl_probe(struct platform_dev
  
  	platform_set_drvdata(pdev, pctl);
  
@@ -322,7 +320,7 @@ Change-Id: I23c4e676146289fe957970986a3ef6907740ba10
  	if (IS_ERR(pctl->domain))
  		return PTR_ERR(pctl->domain);
  	if (!pctl->domain)
-@@ -1908,7 +1983,6 @@ int stm32_pctl_probe(struct platform_dev
+@@ -1892,7 +1969,6 @@ int stm32_pctl_probe(struct platform_dev
  
  	spin_lock_init(&pctl->irqmux_lock);
  

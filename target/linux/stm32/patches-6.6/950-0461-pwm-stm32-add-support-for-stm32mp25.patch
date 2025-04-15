@@ -84,8 +84,8 @@ Change-Id: I7c5e5d39689dfed82a2aec7b62ede3eda41a19ce
 +	priv->chip.npwm = stm32_pwm_detect_channels(priv, ddata, &num_enabled);
  
  	/* Initialize clock refcount to number of enabled PWM channels. */
- 	for (i = 0; i < num_enabled; i++)
-@@ -685,6 +706,7 @@ static SIMPLE_DEV_PM_OPS(stm32_pwm_pm_op
+ 	for (i = 0; i < num_enabled; i++) {
+@@ -688,6 +709,7 @@ static SIMPLE_DEV_PM_OPS(stm32_pwm_pm_op
  
  static const struct of_device_id stm32_pwm_of_match[] = {
  	{ .compatible = "st,stm32-pwm",	},

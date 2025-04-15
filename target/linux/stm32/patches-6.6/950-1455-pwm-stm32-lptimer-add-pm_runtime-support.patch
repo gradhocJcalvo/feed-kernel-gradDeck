@@ -15,8 +15,8 @@ Reviewed-by: Fabrice GASNIER <fabrice.gasnier@foss.st.com>
 ACI: CITOOLS <MDG-smet-aci-reviews@list.st.com>
 Domain-Review: Fabrice GASNIER <fabrice.gasnier@foss.st.com>
 ---
- drivers/pwm/pwm-stm32-lp.c | 52 ++++++++++++++++++++++++++++++--------
- 1 file changed, 42 insertions(+), 10 deletions(-)
+ drivers/pwm/pwm-stm32-lp.c | 50 +++++++++++++++++++++++++++++---------
+ 1 file changed, 39 insertions(+), 11 deletions(-)
 
 --- a/drivers/pwm/pwm-stm32-lp.c
 +++ b/drivers/pwm/pwm-stm32-lp.c
@@ -63,21 +63,19 @@ Domain-Review: Fabrice GASNIER <fabrice.gasnier@foss.st.com>
  
  	regmap_read(priv->regmap, STM32_LPTIM_CR, &val);
  	enabled = !!FIELD_GET(STM32_LPTIM_ENABLE, val);
-@@ -315,8 +317,11 @@ static int stm32_pwm_lp_get_state(struct
- 	state->enabled = enabled;
+@@ -316,9 +318,8 @@ static int stm32_pwm_lp_get_state(struct
  
  	/* Keep PWM counter clock refcount in sync with PWM initial state */
--	if (state->enabled)
--		clk_enable(priv->clk);
-+	if (state->enabled) {
+ 	if (state->enabled) {
+-		int ret = clk_enable(priv->clk);
+-
+-		if (ret)
 +		ret = pm_runtime_resume_and_get(chip->dev);
 +		if (ret < 0)
-+			return ret;
-+	}
+ 			return ret;
+ 	}
  
- 	regmap_read(priv->regmap, STM32_LPTIM_CFGR, &val);
- 	presc = FIELD_GET(STM32_LPTIM_PRESC, val);
-@@ -371,6 +376,10 @@ static int stm32_pwm_lp_probe(struct pla
+@@ -375,6 +376,10 @@ static int stm32_pwm_lp_probe(struct pla
  		priv->chip.npwm = ddata->num_cc_chans;
  	}
  
@@ -88,7 +86,7 @@ Domain-Review: Fabrice GASNIER <fabrice.gasnier@foss.st.com>
  	ret = devm_pwmchip_add(&pdev->dev, &priv->chip);
  	if (ret < 0)
  		return ret;
-@@ -380,7 +389,7 @@ static int stm32_pwm_lp_probe(struct pla
+@@ -384,7 +389,7 @@ static int stm32_pwm_lp_probe(struct pla
  	return 0;
  }
  
@@ -97,7 +95,7 @@ Domain-Review: Fabrice GASNIER <fabrice.gasnier@foss.st.com>
  {
  	struct stm32_pwm_lp *priv = dev_get_drvdata(dev);
  	struct pwm_state state;
-@@ -398,13 +407,36 @@ static int __maybe_unused stm32_pwm_lp_s
+@@ -402,13 +407,36 @@ static int __maybe_unused stm32_pwm_lp_s
  	return pinctrl_pm_select_sleep_state(dev);
  }
  
@@ -137,7 +135,7 @@ Domain-Review: Fabrice GASNIER <fabrice.gasnier@foss.st.com>
  
  static const struct of_device_id stm32_pwm_lp_of_match[] = {
  	{ .compatible = "st,stm32-pwm-lp", },
-@@ -419,7 +451,7 @@ static struct platform_driver stm32_pwm_
+@@ -423,7 +451,7 @@ static struct platform_driver stm32_pwm_
  	.driver	= {
  		.name = "stm32-pwm-lp",
  		.of_match_table = stm32_pwm_lp_of_match,

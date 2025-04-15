@@ -13,8 +13,8 @@ Reviewed-by: Fabrice GASNIER <fabrice.gasnier@foss.st.com>
 Domain-Review: Fabrice GASNIER <fabrice.gasnier@foss.st.com>
 ACI: CITOOLS <MDG-smet-aci-reviews@list.st.com>
 ---
- drivers/pwm/pwm-stm32.c | 93 +++++++++++++++++++++++++++++++++--------
- 1 file changed, 75 insertions(+), 18 deletions(-)
+ drivers/pwm/pwm-stm32.c | 92 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 74 insertions(+), 18 deletions(-)
 
 --- a/drivers/pwm/pwm-stm32.c
 +++ b/drivers/pwm/pwm-stm32.c
@@ -88,27 +88,30 @@ ACI: CITOOLS <MDG-smet-aci-reviews@list.st.com>
  }
  
  static int stm32_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
-@@ -659,8 +662,18 @@ static int stm32_pwm_probe(struct platfo
+@@ -659,12 +662,21 @@ static int stm32_pwm_probe(struct platfo
  	priv->chip.npwm = stm32_pwm_detect_channels(priv, ddata, &num_enabled);
  
  	/* Initialize clock refcount to number of enabled PWM channels. */
--	for (i = 0; i < num_enabled; i++)
+-	for (i = 0; i < num_enabled; i++) {
 +	if (num_enabled) {
 +		for (i = 0; i < num_enabled; i++)
 +			pm_runtime_get_noresume(dev);
 +		pm_runtime_set_active(dev);
- 		clk_enable(priv->clk);
-+	}
-+
+ 		ret = clk_enable(priv->clk);
+ 		if (ret)
+ 			return ret;
+ 	}
+ 
 +	pm_runtime_set_autosuspend_delay(dev, STM32_SLEEP_DELAY_MS);
 +	pm_runtime_use_autosuspend(dev);
 +	ret = devm_pm_runtime_enable(dev);
 +	if (ret)
 +		return ret;
- 
++
  	ret = devm_pwmchip_add(dev, &priv->chip);
  	if (ret < 0)
-@@ -671,11 +684,12 @@ static int stm32_pwm_probe(struct platfo
+ 		return ret;
+@@ -674,11 +686,12 @@ static int stm32_pwm_probe(struct platfo
  	return 0;
  }
  
@@ -122,7 +125,7 @@ ACI: CITOOLS <MDG-smet-aci-reviews@list.st.com>
  
  	/* Look for active channels */
  	ccer = active_channels(priv);
-@@ -689,23 +703,66 @@ static int __maybe_unused stm32_pwm_susp
+@@ -692,23 +705,66 @@ static int __maybe_unused stm32_pwm_susp
  		}
  	}
  
@@ -194,7 +197,7 @@ ACI: CITOOLS <MDG-smet-aci-reviews@list.st.com>
  
  static const struct of_device_id stm32_pwm_of_match[] = {
  	{ .compatible = "st,stm32-pwm",	},
-@@ -720,7 +777,7 @@ static struct platform_driver stm32_pwm_
+@@ -723,7 +779,7 @@ static struct platform_driver stm32_pwm_
  	.driver	= {
  		.name = "stm32-pwm",
  		.of_match_table = stm32_pwm_of_match,

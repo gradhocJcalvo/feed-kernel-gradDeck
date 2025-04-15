@@ -54,7 +54,7 @@ Change-Id: Ia3acaadd400cb064d896e4aefff16947266ba52d
  }
  
  static int stm32_gpio_domain_match(struct irq_domain *dm,
-@@ -1807,8 +1823,12 @@ err_clk:
+@@ -1793,8 +1809,12 @@ static int stm32_gpiolib_register_bank(s
  static void stm32_pctrl_remove_irq(void *data)
  {
  	struct irq_domain *domain = data;
@@ -67,7 +67,7 @@ Change-Id: Ia3acaadd400cb064d896e4aefff16947266ba52d
  }
  
  static struct irq_domain *stm32_pctrl_get_irq_domain(struct stm32_pinctrl *pctl)
-@@ -1816,7 +1836,63 @@ static struct irq_domain *stm32_pctrl_ge
+@@ -1802,7 +1822,63 @@ static struct irq_domain *stm32_pctrl_ge
  	struct device_node *np = pctl->dev->of_node;
  	struct device_node *parent;
  	struct irq_domain *parent_domain, *domain;

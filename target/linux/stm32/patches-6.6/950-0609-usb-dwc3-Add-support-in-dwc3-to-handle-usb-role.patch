@@ -24,7 +24,7 @@ Change-Id: I45c1c8d00af3b64d760a5b381dd6c91b29337b35
 
 --- a/drivers/usb/dwc3/core.c
 +++ b/drivers/usb/dwc3/core.c
-@@ -158,8 +158,21 @@ static void __dwc3_set_mode(struct work_
+@@ -171,8 +171,21 @@ static void __dwc3_set_mode(struct work_
  	if (!desired_dr_role)
  		goto out;
  
@@ -47,7 +47,7 @@ Change-Id: I45c1c8d00af3b64d760a5b381dd6c91b29337b35
  
  	if (desired_dr_role == DWC3_GCTL_PRTCAP_OTG && dwc->edev)
  		goto out;
-@@ -221,8 +234,8 @@ static void __dwc3_set_mode(struct work_
+@@ -234,8 +247,8 @@ static void __dwc3_set_mode(struct work_
  		} else {
  			if (dwc->usb2_phy)
  				otg_set_vbus(dwc->usb2_phy->otg, true);
@@ -58,7 +58,7 @@ Change-Id: I45c1c8d00af3b64d760a5b381dd6c91b29337b35
  			if (dwc->dis_split_quirk) {
  				reg = dwc3_readl(dwc->regs, DWC3_GUCTL3);
  				reg |= DWC3_GUCTL3_SPLITDISABLE;
-@@ -237,8 +250,8 @@ static void __dwc3_set_mode(struct work_
+@@ -250,8 +263,8 @@ static void __dwc3_set_mode(struct work_
  
  		if (dwc->usb2_phy)
  			otg_set_vbus(dwc->usb2_phy->otg, false);
@@ -69,7 +69,7 @@ Change-Id: I45c1c8d00af3b64d760a5b381dd6c91b29337b35
  
  		ret = dwc3_gadget_init(dwc);
  		if (ret)
-@@ -258,7 +271,7 @@ out:
+@@ -271,7 +284,7 @@ out:
  	mutex_unlock(&dwc->mutex);
  }
  
@@ -78,7 +78,7 @@ Change-Id: I45c1c8d00af3b64d760a5b381dd6c91b29337b35
  {
  	unsigned long flags;
  
-@@ -267,6 +280,7 @@ void dwc3_set_mode(struct dwc3 *dwc, u32
+@@ -280,6 +293,7 @@ void dwc3_set_mode(struct dwc3 *dwc, u32
  
  	spin_lock_irqsave(&dwc->lock, flags);
  	dwc->desired_dr_role = mode;
@@ -99,7 +99,7 @@ Change-Id: I45c1c8d00af3b64d760a5b381dd6c91b29337b35
 @@ -1532,7 +1533,9 @@ struct dwc3_gadget_ep_cmd_params {
  
  /* prototypes */
- void dwc3_set_prtcap(struct dwc3 *dwc, u32 mode);
+ void dwc3_set_prtcap(struct dwc3 *dwc, u32 mode, bool ignore_susphy);
 -void dwc3_set_mode(struct dwc3 *dwc, u32 mode);
 +#define dwc3_set_mode(dwc3, mode) \
 +	dwc3_set_mode_ext(dwc3, mode, USB_ROLE_NONE)

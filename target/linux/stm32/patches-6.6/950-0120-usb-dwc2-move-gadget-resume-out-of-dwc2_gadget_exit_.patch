@@ -40,7 +40,7 @@ Reviewed-by: Amelie DELAUNAY <amelie.delaunay@foss.st.com>
  			hsotg->lx_state = DWC2_L0;
 --- a/drivers/usb/dwc2/gadget.c
 +++ b/drivers/usb/dwc2/gadget.c
-@@ -5680,7 +5680,6 @@ void dwc2_gadget_exit_clock_gating(struc
+@@ -5681,7 +5681,6 @@ void dwc2_gadget_exit_clock_gating(struc
  	}
  
  	/* Change to L0 state */

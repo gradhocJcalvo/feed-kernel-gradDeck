@@ -17,7 +17,7 @@ Domain-Review: Fabrice GASNIER <fabrice.gasnier@foss.st.com>
 
 --- a/drivers/counter/stm32-lptimer-cnt.c
 +++ b/drivers/counter/stm32-lptimer-cnt.c
-@@ -502,6 +502,7 @@ static SIMPLE_DEV_PM_OPS(stm32_lptim_cnt
+@@ -508,6 +508,7 @@ static SIMPLE_DEV_PM_OPS(stm32_lptim_cnt
  
  static const struct of_device_id stm32_lptim_cnt_of_match[] = {
  	{ .compatible = "st,stm32-lptimer-counter", },

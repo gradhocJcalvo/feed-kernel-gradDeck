@@ -96,7 +96,7 @@ Change-Id: Ib61112cd8cbcf0c95a5aeeeb924fd70cb9bbed92
  }
  
  static const struct irq_domain_ops stm32_gpio_domain_ops = {
-@@ -1920,8 +1932,13 @@ int stm32_pctl_probe(struct platform_dev
+@@ -1904,8 +1916,13 @@ int stm32_pctl_probe(struct platform_dev
  
  	if (pctl->domain) {
  		ret = stm32_pctrl_dt_setup_irq(pdev, pctl);
@@ -111,7 +111,7 @@ Change-Id: Ib61112cd8cbcf0c95a5aeeeb924fd70cb9bbed92
  	}
  
  	pins = devm_kcalloc(&pdev->dev, pctl->npins, sizeof(*pins),
-@@ -2097,7 +2114,7 @@ static int __maybe_unused stm32_pinctrl_
+@@ -2098,7 +2115,7 @@ static int __maybe_unused stm32_pinctrl_
  			return ret;
  	}
  

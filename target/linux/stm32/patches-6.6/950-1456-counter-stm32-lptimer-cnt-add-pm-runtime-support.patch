@@ -15,8 +15,8 @@ Domain-Review: Fabrice GASNIER <fabrice.gasnier@foss.st.com>
 ACI: CITOOLS <MDG-smet-aci-reviews@list.st.com>
 ACI: CIBUILD <MDG-smet-aci-builds@list.st.com>
 ---
- drivers/counter/stm32-lptimer-cnt.c | 45 ++++++++++++++++++++++++-----
- 1 file changed, 37 insertions(+), 8 deletions(-)
+ drivers/counter/stm32-lptimer-cnt.c | 45 +++++++++++++++++++++++++----
+ 1 file changed, 39 insertions(+), 6 deletions(-)
 
 --- a/drivers/counter/stm32-lptimer-cnt.c
 +++ b/drivers/counter/stm32-lptimer-cnt.c
@@ -40,18 +40,18 @@ ACI: CIBUILD <MDG-smet-aci-builds@list.st.com>
  		priv->enabled = false;
  		return 0;
  	}
-@@ -79,8 +83,8 @@ static int stm32_lptim_set_enable_state(
+@@ -83,6 +87,10 @@ static int stm32_lptim_set_enable_state(
  	if (ret)
- 		return ret;
+ 		goto disable_clk;
  
--	ret = clk_enable(priv->clk);
--	if (ret) {
 +	ret = pm_runtime_resume_and_get(priv->dev);
-+	if (ret < 0) {
- 		regmap_write(priv->regmap, STM32_LPTIM_CR, 0);
- 		return ret;
- 	}
-@@ -443,6 +447,10 @@ static int stm32_lptim_cnt_probe(struct
++	if (ret < 0)
++		goto disable_clk;
++
+ 	priv->enabled = true;
+ 
+ 	/* Start LP timer in continuous mode */
+@@ -449,6 +457,10 @@ static int stm32_lptim_cnt_probe(struct
  
  	platform_set_drvdata(pdev, priv);
  
@@ -62,7 +62,7 @@ ACI: CIBUILD <MDG-smet-aci-builds@list.st.com>
  	ret = devm_counter_add(&pdev->dev, counter);
  	if (ret < 0)
  		return dev_err_probe(&pdev->dev, ret, "Failed to add counter\n");
-@@ -450,7 +458,6 @@ static int stm32_lptim_cnt_probe(struct
+@@ -456,7 +468,6 @@ static int stm32_lptim_cnt_probe(struct
  	return 0;
  }
  
@@ -70,7 +70,7 @@ ACI: CIBUILD <MDG-smet-aci-builds@list.st.com>
  static int stm32_lptim_cnt_suspend(struct device *dev)
  {
  	struct stm32_lptim_cnt *priv = dev_get_drvdata(dev);
-@@ -495,10 +502,32 @@ static int stm32_lptim_cnt_resume(struct
+@@ -501,10 +512,32 @@ static int stm32_lptim_cnt_resume(struct
  
  	return 0;
  }
@@ -106,7 +106,7 @@ ACI: CIBUILD <MDG-smet-aci-builds@list.st.com>
  
  static const struct of_device_id stm32_lptim_cnt_of_match[] = {
  	{ .compatible = "st,stm32-lptimer-counter", },
-@@ -513,7 +542,7 @@ static struct platform_driver stm32_lpti
+@@ -519,7 +552,7 @@ static struct platform_driver stm32_lpti
  	.driver = {
  		.name = "stm32-lptimer-counter",
  		.of_match_table = stm32_lptim_cnt_of_match,

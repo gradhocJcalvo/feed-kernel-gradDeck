@@ -36,7 +36,7 @@ Signed-off-by: Yannick Fertre <yannick.fertre@foss.st.com>
  			state->hdr_output_metadata->base.id : 0;
 --- a/drivers/gpu/drm/drm_connector.c
 +++ b/drivers/gpu/drm/drm_connector.c
-@@ -952,6 +952,12 @@ static const struct drm_prop_enum_list d
+@@ -953,6 +953,12 @@ static const struct drm_prop_enum_list d
  	{ DRM_MODE_SCALE_ASPECT, "Full aspect" },
  };
  
@@ -49,7 +49,7 @@ Signed-off-by: Yannick Fertre <yannick.fertre@foss.st.com>
  static const struct drm_prop_enum_list drm_aspect_ratio_enum_list[] = {
  	{ DRM_MODE_PICTURE_ASPECT_NONE, "Automatic" },
  	{ DRM_MODE_PICTURE_ASPECT_4_3, "4:3" },
-@@ -2102,6 +2108,62 @@ int drm_connector_attach_scaling_mode_pr
+@@ -2107,6 +2113,62 @@ int drm_connector_attach_scaling_mode_pr
  EXPORT_SYMBOL(drm_connector_attach_scaling_mode_property);
  
  /**
@@ -140,7 +140,7 @@ Signed-off-by: Yannick Fertre <yannick.fertre@foss.st.com>
  	 * @vrr_capable_property: Optional property to help userspace
  	 * query hardware support for variable refresh rate on a connector.
  	 * connector. Drivers can add the property to a connector by
-@@ -2001,6 +2013,8 @@ int drm_mode_create_scaling_mode_propert
+@@ -2004,6 +2016,8 @@ int drm_mode_create_scaling_mode_propert
  int drm_connector_attach_content_type_property(struct drm_connector *dev);
  int drm_connector_attach_scaling_mode_property(struct drm_connector *connector,
  					       u32 scaling_mode_mask);

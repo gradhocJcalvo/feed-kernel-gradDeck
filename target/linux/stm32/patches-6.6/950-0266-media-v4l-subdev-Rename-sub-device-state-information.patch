@@ -25,7 +25,7 @@ Signed-off-by: Mauro Carvalho Chehab <mchehab@kernel.org>
 
 --- a/drivers/media/i2c/ds90ub913.c
 +++ b/drivers/media/i2c/ds90ub913.c
-@@ -426,8 +426,7 @@ static int ub913_set_fmt(struct v4l2_sub
+@@ -440,8 +440,7 @@ static int ub913_set_fmt(struct v4l2_sub
  	}
  
  	/* Set sink format */
@@ -37,7 +37,7 @@ Signed-off-by: Mauro Carvalho Chehab <mchehab@kernel.org>
  
 --- a/drivers/media/i2c/ds90ub953.c
 +++ b/drivers/media/i2c/ds90ub953.c
-@@ -560,8 +560,7 @@ static int ub953_set_fmt(struct v4l2_sub
+@@ -565,8 +565,7 @@ static int ub953_set_fmt(struct v4l2_sub
  		return v4l2_subdev_get_fmt(sd, state, format);
  
  	/* Set sink format */
@@ -49,7 +49,7 @@ Signed-off-by: Mauro Carvalho Chehab <mchehab@kernel.org>
  
 --- a/drivers/media/i2c/ds90ub960.c
 +++ b/drivers/media/i2c/ds90ub960.c
-@@ -2451,9 +2451,8 @@ static int ub960_configure_ports_for_str
+@@ -2461,9 +2461,8 @@ static int ub960_configure_ports_for_str
  		if (rx_data[nport].num_streams > 2)
  			return -EPIPE;
  
@@ -61,7 +61,7 @@ Signed-off-by: Mauro Carvalho Chehab <mchehab@kernel.org>
  		if (!fmt)
  			return -EPIPE;
  
-@@ -2844,8 +2843,8 @@ static int ub960_get_frame_desc(struct v
+@@ -2854,8 +2853,8 @@ static int ub960_get_frame_desc(struct v
  			const struct ub960_format_info *ub960_fmt;
  			struct v4l2_mbus_framefmt *fmt;
  
@@ -72,7 +72,7 @@ Signed-off-by: Mauro Carvalho Chehab <mchehab@kernel.org>
  
  			if (!fmt) {
  				ret = -EINVAL;
-@@ -2893,8 +2892,7 @@ static int ub960_set_fmt(struct v4l2_sub
+@@ -2903,8 +2902,7 @@ static int ub960_set_fmt(struct v4l2_sub
  	if (!ub960_find_format(format->format.code))
  		format->format.code = ub960_formats[0].code;
  

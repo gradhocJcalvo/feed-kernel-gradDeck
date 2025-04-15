@@ -177,8 +177,8 @@ Change-Id: I1274d41de76a88eeffd03ae31444526b7ab59adc
  		delay = stm32_pconf_get_delay(bank, offset);
  
  		if (retime || clk_type || clk_edge || delay_path || delay)
-@@ -1985,14 +1985,14 @@ int stm32_pctl_probe(struct platform_dev
- 	return 0;
+@@ -1986,14 +1986,14 @@ err_register:
+ 	return ret;
  }
  
 -static int __maybe_unused stm32_pinctrl_restore_piocfgr(struct stm32_gpio_bank *bank,
@@ -196,7 +196,7 @@ Change-Id: I1274d41de76a88eeffd03ae31444526b7ab59adc
  }
  
  static int __maybe_unused stm32_pinctrl_restore_gpio_regs(
-@@ -2053,23 +2053,23 @@ static int __maybe_unused stm32_pinctrl_
+@@ -2054,23 +2054,23 @@ static int __maybe_unused stm32_pinctrl_
  		return ret;
  
  	if (bank->io_sync_control) {
