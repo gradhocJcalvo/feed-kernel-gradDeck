@@ -16,8 +16,8 @@ And more boards are supported in the feed.
 You are using the `openwrt-24.10` branch of the feed, which is based on the
 OpenWrt branch `openwrt-24.10`.
 Actually the feed is based on OpenWrt
-[v24.10.0](https://github.com/openwrt/openwrt/tree/v24.10.0)
-([Release Note](https://openwrt.org/releases/24.10/notes-24.10.0)).
+[v24.10.1](https://github.com/openwrt/openwrt/tree/v24.10.1)
+([Release Note](https://openwrt.org/releases/24.10/notes-24.10.1)).
 
 ## Supported devices
 
@@ -79,6 +79,7 @@ c5540f6a4d9a ("nvmem: stm32: add support for STM32MP25 BSEC to control OTP data"
 eb99d7c27da7 ("crypto: stm32/cryp - call finalize with bh disabled")
 31286612453a ("perf list: fix arguments order issue for events printing")
 fd68ca2e9089 ("i2c: stm32f7: Do not prepare/unprepare clock during runtime suspend/resume")
+1d8ffe3fcfac ("ARM: dts: stm32: fix IPCC EXTI declaration on stm32mp151")
 ```
 
 Some patches had to be modified to fix some conflicts.
@@ -88,6 +89,11 @@ Some patches had to be modified to fix some conflicts.
 393cf701259c ("mtd: spi-nor: add Octal DTR support for Macronix flash")
 1e5eedcdaf1c ("firmware: arm_scmi: optee leverage Ocall2 thread provisioning")
 9d36363eee52 ("counter: stm32-timer-cnt: add pm runtime support")
+e983ec4d6702 ("pinctrl: stm32: add tristate option for stm32mp257")
+a04c279efc3c ("usb: dwc3: Add support in dwc3 to handle usb-role")
+b1f3318a0f09 ("ASoC: Update wm8994 codec config")
+27c33fae20e0 ("pwm: stm32: lptimer: add pm_runtime support")
+dd680178e937 ("counter: stm32-lptimer-cnt: add pm runtime support")
 ```
 Following patches were not applied due to conflicts. They corresponds to the
 empty patches in `target/linux/stm32/patches-6.1/`. They could be applied in the
@@ -129,12 +135,12 @@ And you need to install a set of packages as described in the
 ### Getting the code
 
 The feed is designed to work with the `openwrt-24.10` branch of OpenWRT (last
-tested commit is [v24.10.0](https://github.com/openwrt/openwrt/commit/v24.10.0)).
+tested commit is [v24.10.1](https://github.com/openwrt/openwrt/tree/v24.10.1)).
 
 ```bash
 $ git clone https://git.openwrt.org/openwrt/openwrt.git
 $ cd openwrt
-$ git checkout v24.10.0
+$ git checkout v24.10.1
 ```
 
 Next step is to add the [STMicroelectronics](https://www.st.com) feed in the
