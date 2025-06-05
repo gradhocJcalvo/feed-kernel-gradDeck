@@ -1,0 +1,41 @@
+From c51e6ce29c5fcbb62c17f7cbb974efd26782aeaa Mon Sep 17 00:00:00 2001
+From: Thomas Richard <thomas.richard@bootlin.com>
+Date: Tue, 11 Feb 2025 18:04:04 +0100
+Subject: [PATCH] drm/stm: fix compile issue
+
+It is a temporary fix. The compile issue comes from the fact that commit
+6a508bd6b305 ("drm/stm: refactor probe sequence") was not applied (due to
+merge conflicts). This commit refactors the probe sequence and introduces
+the label 'err_suspend'.
+
+The patch 950-0918-drm-stm-set-max-segment-size.patch which corresponds to
+commit 7529e7646317 ("drm/stm: set max segment size"), uses this label
+which cause a compile issue.
+
+For now to fix the compile issue, this commit removes the use of the
+err_suspend label. But all drm patches should be integrated correctly to
+fix the build.
+
+Signed-off-by: Thomas Richard <thomas.richard@bootlin.com>
+---
+ drivers/gpu/drm/stm/drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/drivers/gpu/drm/stm/drv.c
++++ b/drivers/gpu/drm/stm/drv.c
+@@ -212,13 +212,13 @@ static int stm_drm_platform_probe(struct
+ 	ret = dma_set_coherent_mask(dev, DMA_BIT_MASK(32));
+ 	if (ret) {
+ 		dev_err(dev, "Failed to set DMA segment mask\n");
+-		goto err_suspend;
++		return ret;
+ 	}
+ 
+ 	ret = dma_set_max_seg_size(dev, DMA_BIT_MASK(32));
+ 	if (ret) {
+ 		dev_err(dev, "Failed to set DMA segment size\n");
+-		goto err_suspend;
++		return ret;
+ 	}
+ 
+ 	ddev = drm_dev_alloc(&drv_driver, dev);
