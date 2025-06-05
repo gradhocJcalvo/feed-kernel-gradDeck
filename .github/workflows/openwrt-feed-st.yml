@@ -1,65 +1,162 @@
 on: workflow_dispatch
 jobs:
   build-all:
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
     env:
-      openwrt_version: v24.10.1
+      OPENWRT_VERSION: 24.10.1
+      REF: "${{ github.ref_type == 'tag' && github.ref_name || 'latest' }}"
+      B2: "${{ secrets.B2_KEY_ID != '' && 'store' }}"
+      NPROC: 32
     strategy:
       matrix:
-        include:
-          - subtarget: stm32mp1
-            profile: stm32mp157f-dk2
-          - subtarget: stm32mp1
-            profile: stm32mp157f-dk2-demo
-          - subtarget: stm32mp1
-            profile: stm32mp135f-dk
-          - subtarget: stm32mp1
-            profile: stm32mp135f-dk-demo
-          - subtarget: stm32mp2
-            profile: stm32mp257f-ev1
-          - subtarget: stm32mp2
-            profile: stm32mp257f-ev1-demo
-          - subtarget: stm32mp2
-            profile: stm32mp257f-dk
-          - subtarget: stm32mp2
-            profile: stm32mp257f-dk-demo
-
+        subtarget: [ "stm32mp1", "stm32mp2" ]
     steps:
       - uses: actions/checkout@v4
         with:
-          path: openwrt-feed-st
-      - uses: actions/checkout@v4
-        with:
           repository: openwrt/openwrt
-          ref: ${{ env.openwrt_version }}
+          ref: v${{ env.OPENWRT_VERSION }}
           path: openwrt
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y python3-pyelftools python3-cryptography python3-setuptools python3-pil python3-dev
-          sudo apt install -y device-tree-compiler swig
+
       - name: Add ST feed
-        run: echo src-link st /home/runner/work/openwrt-feed-st/openwrt-feed-st/openwrt-feed-st >> openwrt/feeds.conf.default
+        run: echo src-git st ${{ github.server_url }}/${{ github.repository }}^${{ github.sha }} >> openwrt/feeds.conf.default
       - name: Update feeds
         run: cd openwrt; ./scripts/feeds update -a
       - name: Install stm32 target
         run: cd openwrt; ./scripts/feeds install -f stm32
       - name: Install all other feeds
         run: cd openwrt; ./scripts/feeds install -a -f
+
       - name: Configure
         run: |
-          printf "CONFIG_TARGET_stm32=y\\nCONFIG_TARGET_stm32_${{ matrix.subtarget }}=y\\nCONFIG_TARGET_stm32_${{ matrix.subtarget }}_DEVICE_${{ matrix.profile }}=y\\n" > openwrt/.config
+          echo CONFIG_TARGET_stm32=y > openwrt/.config
+          echo CONFIG_TARGET_stm32_${{ matrix.subtarget }}=y >> openwrt/.config
+          echo CONFIG_TARGET_MULTI_PROFILE=y >> openwrt/.config
+          echo CONFIG_ALL_KMODS=y >> openwrt/.config
+          echo CONFIG_ALL_NONSHARED=y >> openwrt/.config
+          echo CONFIG_DEVEL=y >> openwrt/.config
+          echo CONFIG_TARGET_PER_DEVICE_ROOTFS=y >> openwrt/.config
+          echo CONFIG_COLLECT_KERNEL_DEBUG=y >> openwrt/.config
+          echo CONFIG_IB=y >> openwrt/.config
+          echo CONFIG_IB_STANDALONE=y >> openwrt/.config
+          echo CONFIG_JSON_CYCLONEDX_SBOM=y >> openwrt/.config
+          echo CONFIG_KERNEL_BUILD_DOMAIN="buildhost" >> openwrt/.config
+          echo CONFIG_KERNEL_BUILD_USER="builder" >> openwrt/.config
+          echo CONFIG_MAKE_TOOLCHAIN=y >> openwrt/.config
+          echo CONFIG_REPRODUCIBLE_DEBUG_INFO=y >> openwrt/.config
+          echo CONFIG_SDK=y >> openwrt/.config
+          echo CONFIG_SDK_LLVM_BPF=y >> openwrt/.config
+          echo CONFIG_TARGET_ALL_PROFILES=y >> openwrt/.config
           make -C openwrt defconfig
       - name: Build
         id: build
-        run: make -j4 -C openwrt || make -C openwrt -j1 V=s
-      - name: 'Archive factory image'
+        run: make -j${{ env.NPROC }} -C openwrt || make -C openwrt -j1 V=s
+
+      - name: Archive and compress factory images
+        run: |
+          find openwrt/bin/targets/stm32/${{ matrix.subtarget }} -maxdepth 1 -name openwrt-stm32-${{ matrix.subtarget }}-*-factory.img.gz -printf '%f\n' > openwrt/bin/targets/stm32/${{ matrix.subtarget }}/factory.list
+          tar -cf - -C openwrt/bin/targets/stm32/${{ matrix.subtarget }} -T openwrt/bin/targets/stm32/${{ matrix.subtarget }}/factory.list | gzip -9 - > openwrt-stm32-${{ matrix.subtarget }}-factory-images.tar.gz
+      - name: Archive and compress sysupgrade images
+        run: |
+          find openwrt/bin/targets/stm32/${{ matrix.subtarget }} -maxdepth 1 -name openwrt-stm32-${{ matrix.subtarget }}-*-sysupgrade.img.gz -printf '%f\n' > openwrt/bin/targets/stm32/${{ matrix.subtarget }}/sysupgrade.list
+          tar -cf - -C openwrt/bin/targets/stm32/${{ matrix.subtarget }} -T openwrt/bin/targets/stm32/${{ matrix.subtarget }}/sysupgrade.list | gzip -9 - > openwrt-stm32-${{ matrix.subtarget }}-sysupgrade-images.tar.gz
+      - name: Archive and compress repositories
+        run: |
+          tar -cf - -C openwrt/bin/targets/stm32/${{ matrix.subtarget }}/packages/ . | gzip -9 - > openwrt-stm32-${{ matrix.subtarget }}-target-repository.tar.gz
+          tar -cf - -C $(find openwrt/bin/packages/*/st -maxdepth 0 -type d) . | gzip -9 - > openwrt-stm32-${{ matrix.subtarget }}-st-repository.tar.gz
+
+      - name: Install b2
+        if: env.B2 == 'store'
+        run: |
+          python3 -m venv venv
+          venv/bin/pip install b2
+      - name: Register to b2
+        if: env.B2 == 'store'
+        run: |
+          venv/bin/b2 account clear > /dev/null 2>&1
+          venv/bin/b2 account authorize ${{ secrets.B2_KEY_ID }} ${{ secrets.B2_APPLICATION_KEY }} > /dev/null 2>&1
+
+      - name: Store images
+        if: env.B2 == 'store'
+        run: |
+          venv/bin/b2 file upload bootlin-openwrt-st openwrt-stm32-${{ matrix.subtarget }}-factory-images.tar.gz ${{ env.REF }}/openwrt-stm32-${{ matrix.subtarget }}-factory-images.tar.gz
+          venv/bin/b2 file upload bootlin-openwrt-st openwrt-stm32-${{ matrix.subtarget }}-sysupgrade-images.tar.gz ${{ env.REF }}/openwrt-stm32-${{ matrix.subtarget }}-sysupgrade-images.tar.gz
+      - name: Store SDK
+        if: env.B2 == 'store'
+        run: venv/bin/b2 file upload bootlin-openwrt-st openwrt/bin/targets/stm32/${{ matrix.subtarget }}/openwrt-sdk-stm32-${{ matrix.subtarget }}_*.Linux-x86_64.tar.zst ${{ env.REF }}/openwrt-sdk-stm32-${{ matrix.subtarget }}.Linux-x86_64.tar.zst
+      - name: Store Image Builder
+        if: env.B2 == 'store'
+        run: venv/bin/b2 file upload bootlin-openwrt-st openwrt/bin/targets/stm32/${{ matrix.subtarget }}/openwrt-imagebuilder-stm32-${{ matrix.subtarget }}.Linux-x86_64.tar.zst ${{ env.REF }}/openwrt-imagebuilder-stm32-${{ matrix.subtarget }}.Linux-x86_64.tar.zst
+      - name: Store buildinfos
+        if: env.B2 == 'store'
+        run: |
+          venv/bin/b2 file upload bootlin-openwrt-st openwrt/bin/targets/stm32/${{ matrix.subtarget }}/config.buildinfo ${{ env.REF }}/config-stm32-${{ matrix.subtarget }}.buildinfo
+          venv/bin/b2 file upload bootlin-openwrt-st openwrt/bin/targets/stm32/${{ matrix.subtarget }}/feeds.buildinfo ${{ env.REF }}/feeds-stm32-${{ matrix.subtarget }}.buildinfo
+      - name: Store SBOM
+        if: env.B2 == 'store'
+        run: venv/bin/b2 file upload bootlin-openwrt-st openwrt/bin/targets/stm32/${{ matrix.subtarget }}/openwrt-stm32-${{ matrix.subtarget }}.bom.cdx.json ${{ env.REF }}/openwrt-stm32-${{ matrix.subtarget }}.bom.cdx.json
+      - name: Store repositories
+        if: env.B2 == 'store'
+        run: |
+          venv/bin/b2 file upload bootlin-openwrt-st openwrt-stm32-${{ matrix.subtarget }}-target-repository.tar.gz ${{ env.REF }}/openwrt-stm32-${{ matrix.subtarget }}-target-repository.tar.gz
+          venv/bin/b2 file upload bootlin-openwrt-st openwrt-stm32-${{ matrix.subtarget }}-st-repository.tar.gz ${{ env.REF }}/openwrt-stm32-${{ matrix.subtarget }}-st-repository.tar.gz
+
+      - name: Github artifact images
         uses: actions/upload-artifact@v4
         with:
-          name: openwrt-stm32-${{ matrix.subtarget }}-${{ matrix.profile }}-ext4-factory.img.gz
-          path: openwrt/bin/targets/stm32/${{ matrix.subtarget }}/openwrt-stm32-${{ matrix.subtarget }}-${{ matrix.profile }}-ext4-factory.img.gz
-      - name: 'Archive sysupgrade image'
+          name: openwrt-stm32-${{ matrix.subtarget }}-factory-images
+          path: openwrt-stm32-${{ matrix.subtarget }}-*-images.tar.gz
+          if-no-files-found: error
+      - name: Github artifact SDK
         uses: actions/upload-artifact@v4
         with:
-          name: openwrt-stm32-${{ matrix.subtarget }}-${{ matrix.profile }}-ext4-sysupgrade.img.gz
-          path: openwrt/bin/targets/stm32/${{ matrix.subtarget }}/openwrt-stm32-${{ matrix.subtarget }}-${{ matrix.profile }}-ext4-sysupgrade.img.gz
+          name: openwrt-sdk-stm32-${{ matrix.subtarget }}
+          path: openwrt/bin/targets/stm32/${{ matrix.subtarget }}/openwrt-sdk-stm32-${{ matrix.subtarget }}_*.Linux-x86_64.tar.zst
+          if-no-files-found: error
+      - name: Github artifact ImageBuilder
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-imagebuilder-stm32-${{ matrix.subtarget }}
+          path: openwrt/bin/targets/stm32/${{ matrix.subtarget }}/openwrt-imagebuilder-stm32-${{ matrix.subtarget }}.Linux-x86_64.tar.zst
+          if-no-files-found: error
+      - name: Github artifact config.info
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-config-stm32-${{ matrix.subtarget }}.buildinfo
+          path: openwrt/bin/targets/stm32/${{ matrix.subtarget }}/config.buildinfo
+          if-no-files-found: error
+      - name: Github artifact feeds.info
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-feeds-stm32-${{ matrix.subtarget }}.buildinfo
+          path: openwrt/bin/targets/stm32/${{ matrix.subtarget }}/feeds.buildinfo
+          if-no-files-found: error
+      - name: Github artifact SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-stm32-${{ matrix.subtarget }}.bom.cdx.json
+          path: openwrt/bin/targets/stm32/${{ matrix.subtarget }}/openwrt-stm32-${{ matrix.subtarget }}.bom.cdx.json
+          if-no-files-found: error
+      - name: Github artifact manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-stm32-${{ matrix.subtarget }}.manifest
+          path: openwrt/bin/targets/stm32/${{ matrix.subtarget }}/openwrt-stm32-${{ matrix.subtarget }}.manifest
+          if-no-files-found: error
+      - name: Github artifact target specific packages repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-stm32-${{ matrix.subtarget }}-target-repository
+          path: openwrt-stm32-${{ matrix.subtarget }}-target-repository.tar.gz
+          if-no-files-found: error
+      - name: Github artifact st packages repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-stm32-${{ matrix.subtarget }}-st-repository
+          path: openwrt-stm32-${{ matrix.subtarget }}-st-repository.tar.gz
+          if-no-files-found: error
+
+      - name: Cleanup
+        run: |
+          rm -rf venv
+          rm -f openwrt-*
+          make -C openwrt distclean
