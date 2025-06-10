@@ -5,8 +5,6 @@
 
 BOARDNAME:=STM32MP2 boards
 ARCH:=aarch64
-CPU_TYPE:=cortex-a35
-CPU_SUBTYPE=fp-armv8
 FEATURES+=fpu
 KERNEL_IMAGES:=Image.gz
 
