@@ -123,6 +123,50 @@ dc9d876018c6 ("drm/stm: ltdc: Check the security of layer 2.")
 3682d604ecbd ("drm/stm: ltdc: reset ltdc on crtc enable")
 ```
 
+## Starter Package
+
+If you want to use OpenWrt on STM32MPU platforms without building everything
+yourself from source, we provide a Starter Package which contains:
+
+* The prebuilt factory and sysupgrade images for all profiles. Refer to the [flash
+  and boot section](#Flashing-and-booting-the-system) to learn how to
+  use the pre-built images.
+
+* A Software Development Kit (SDK) that allows you to build and package
+  applications for the target.
+
+* An Image Builder that allows you to create custom images without the need
+  for compiling them from source. It downloads pre-compiled packages and
+  integrates them in a single flashable image.
+
+* A build info file that contains the configuration used to build the Starter
+  Package.
+
+* A feed info file that contains the feed configuration used to build the Starter
+  Package.
+
+* A Software Bill of Materials (SBOM).
+
+* A target repository (contains kmods and target-specific packages) that allows
+  to install additional packages on the device.
+
+* A ST repository that contains packages (non target-specific) from ST feed.
+
+The following table provides links to all these artifacts, compiled with the
+latest `openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06` release.
+
+| Starter Package | stm32mp1 | stm32mp2 |
+|-----------------|----------|----------|
+| Factory images | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-stm32-stm32mp1-factory-images.tar.gz) | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-stm32-stm32mp2-factory-images.tar.gz) |
+| Sysupgrade images | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-stm32-stm32mp1-sysupgrade-images.tar.gz) | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-stm32-stm32mp2-sysupgrade-images.tar.gz) |
+| SDK | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-sdk-stm32-stm32mp1.Linux-x86_64.tar.zst) | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-sdk-stm32-stm32mp2.Linux-x86_64.tar.zst) |
+| Image Buider | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-imagebuilder-stm32-stm32mp1.Linux-x86_64.tar.zst) | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-imagebuilder-stm32-stm32mp2.Linux-x86_64.tar.zst) |
+| Build info | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/config-stm32-stm32mp1.buildinfo) | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/config-stm32-stm32mp2.buildinfo) |
+| Feed info | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/feeds-stm32-stm32mp1.buildinfo) | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/feeds-stm32-stm32mp2.buildinfo) |
+| SBOM | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-stm32-stm32mp1.bom.cdx.json) | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-stm32-stm32mp2.bom.cdx.json) |
+| target repository | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-stm32-stm32mp1-target-repository.tar.gz) | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-stm32-stm32mp2-target-repository.tar.gz) |
+| ST repository | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-stm32-stm32mp1-st-repository.tar.gz) | [URL](https://bootlin.com/pub/openwrt-st/openstlinux-6.6-openwrt-24.10.1-mpu-v24.11.06/openwrt-stm32-stm32mp2-st-repository.tar.gz) |
+
 ## Getting started
 
 ### Pre-requisites
