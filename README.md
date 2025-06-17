@@ -392,4 +392,5 @@ service rngd restart
 * [Using the STM32 Cube Programmer](docs/stm32cubeprogrammer.md)
 * [Using the OpenWrt SDK](docs/sdk.md)
 * [Using the OpenWrt Image Builder](docs/imagebuilder.md)
+* [Using the package repositories](docs/repositories.md)
 * [Benchmarking](docs/benchmarking.md)
