@@ -364,6 +364,30 @@ endef
 $(eval $(call KernelPackage,stm32-mdf-core))
 
 
+define KernelPackage/stm32-rproc
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=STM32 remoteproc support
+  DEPENDS:=@TARGET_stm32_stm32mp2
+  KCONFIG:=CONFIG_STM32_RPROC
+  FILES:=$(LINUX_DIR)/drivers/remoteproc/stm32_rproc.ko
+  AUTOLOAD:=$(call AutoProbe,stm32_rproc)
+endef
+
+$(eval $(call KernelPackage,stm32-rproc))
+
+
+define KernelPackage/stm32-m0-rproc
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=STM32 remoteproc support for CM0+
+  DEPENDS:=@TARGET_stm32_stm32mp2
+  KCONFIG:=CONFIG_STM32_M0_RPROC
+  FILES:=$(LINUX_DIR)/drivers/remoteproc/stm32_m0_rproc.ko
+  AUTOLOAD:=$(call AutoProbe,stm32_m0_rproc)
+endef
+
+$(eval $(call KernelPackage,stm32-m0-rproc))
+
+
 define KernelPackage/stm32-timers
   TITLE:=STM32 Timers
   DEPENDS:=@TARGET_stm32 +kmod-mfd
