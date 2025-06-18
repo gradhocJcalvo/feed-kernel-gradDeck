@@ -341,6 +341,18 @@ endef
 $(eval $(call KernelPackage,stm32-hash))
 
 
+define KernelPackage/stm32-ipcc
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=STM32 IPCC Mailbox
+  DEPENDS:=@TARGET_stm32_stm32mp2
+  KCONFIG:=CONFIG_STM32_IPCC
+  FILES:=$(LINUX_DIR)/drivers/mailbox/stm32-ipcc.ko
+  AUTOLOAD:=$(call AutoProbe,stm32-ipcc)
+endef
+
+$(eval $(call KernelPackage,stm32-ipcc))
+
+
 define KernelPackage/stm32-mdf-adc
   TITLE:=STMicroelectronics STM32 MDF adc
   KCONFIG:=CONFIG_STM32_MDF_ADC
