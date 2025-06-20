@@ -449,6 +449,29 @@ endef
 $(eval $(call KernelPackage,st-thermal))
 
 
+define KernelPackage/typec
+  SUBMENU:=$(USB_MENU)
+  TITLE:=USB Type-C Support
+  DEPENDS:=@USB_SUPPORT
+  KCONFIG:=CONFIG_TYPEC \
+	   CONFIG_TYPEC_ANX7411=n \
+	   CONFIG_TYPEC_TPS6598X=n \
+	   CONFIG_TYPEC_RT1719=n \
+	   CONFIG_TYPEC_HD3SS3220=n \
+	   CONFIG_TYPEC_STUSB160X=n \
+	   CONFIG_TYPEC_WUSB3801=n \
+	   CONFIG_TYPEC_MUX_FSA4480=n \
+	   CONFIG_TYPEC_MUX_GPIO_SBU=n \
+	   CONFIG_TYPEC_MUX_PI3USB30532=n \
+	   CONFIG_TYPEC_MUX_NB7VPQ904M=n \
+	   CONFIG_QCOM_PMIC_GLINK=n
+  FILES:=$(LINUX_DIR)/drivers/usb/typec/typec.ko
+  AUTOLOAD:=$(call AutoProbe,typec)
+endef
+
+$(eval $(call KernelPackage,typec))
+
+
 define KernelPackage/usb-dwc3-stm32
   TITLE:=STM32 DWC3 support
   KCONFIG:=CONFIG_USB_DWC3_STM32
