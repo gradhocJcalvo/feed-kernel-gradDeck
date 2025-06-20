@@ -472,6 +472,20 @@ endef
 $(eval $(call KernelPackage,typec))
 
 
+define KernelPackage/typec-ucsi
+  SUBMENU:=$(USB_MENU)
+  TITLE:=USB Type-C Connector System Software Interface driver
+  DEPENDS:=@USB_SUPPORT +kmod-typec +kmod-usb-roles
+  KCONFIG:=CONFIG_TYPEC_UCSI \
+	   CONFIG_UCSI_CCG=n \
+	   CONFIG_UCSI_PMIC_GLINK=n
+  FILES:=$(LINUX_DIR)/drivers/usb/typec/ucsi/typec_ucsi.ko
+  AUTOLOAD:=$(call AutoProbe,typec_ucsi)
+endef
+
+$(eval $(call KernelPackage,typec-ucsi))
+
+
 define KernelPackage/usb-dwc3-stm32
   TITLE:=STM32 DWC3 support
   KCONFIG:=CONFIG_USB_DWC3_STM32
