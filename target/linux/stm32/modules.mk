@@ -513,3 +513,15 @@ define KernelPackage/usb-stm32-usbh/description
 endef
 
 $(eval $(call KernelPackage,usb-stm32-usbh))
+
+
+define KernelPackage/ucsi-stm32g0
+  SUBMENU:=$(USB_MENU)
+  TITLE:=UCSI Interface Driver for STM32G0
+  DEPENDS:=@USB_SUPPORT +kmod-typec-ucsi +kmod-i2c-core
+  KCONFIG:=CONFIG_UCSI_STM32G0
+  FILES:=$(LINUX_DIR)/drivers/usb/typec/ucsi/ucsi_stm32g0.ko
+  AUTOLOAD:=$(call AutoProbe,ucsi-stm32g0)
+endef
+
+$(eval $(call KernelPackage,ucsi-stm32g0))
