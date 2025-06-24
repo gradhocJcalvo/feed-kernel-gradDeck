@@ -64,6 +64,18 @@ endef
 $(eval $(call KernelPackage,industrialio-backend))
 
 
+define KernelPackage/i2c-rpmsg
+  SUBMENU:=$(I2C_MENU)
+  TITLE:=RPMSG I2C driver
+  DEPENDS:=@TARGET_stm32_stm32mp2 +kmod-rpmsg
+  KCONFIG:=CONFIG_I2C_RPMSG
+  FILES:=$(LINUX_DIR)/drivers/i2c/busses/i2c-rpmsg.ko
+  AUTOLOAD:=$(call AutoProbe,i2c-rpmsg)
+endef
+
+$(eval $(call KernelPackage,i2c-rpmsg))
+
+
 define KernelPackage/nvmem-stm32-romem
   SUBMENU:=$(OTHER_MENU)
   TITLE:=STM32 factory-programmed memory support
@@ -102,6 +114,45 @@ define KernelPackage/phy-stm32-usbphyc/description
 endef
 
 $(eval $(call KernelPackage,phy-stm32-usbphyc))
+
+
+define KernelPackage/rpmsg
+  TITLE:=Virtio RPMSG bus driver
+  DEPENDS:=@TARGET_stm32_stm32mp2
+  HIDDEN:=1
+  KCONFIG:=CONFIG_RPMSG \
+	   CONFIG_RPMSG_TTY=n \
+	   CONFIG_RPMSG_CHAR=n \
+	   CONFIG_RPMSG_CTRL=n
+  FILES:=$(LINUX_DIR)/drivers/rpmsg/rpmsg_core.ko
+  AUTOLOAD:=$(call AutoProbe,rpmsg_core)
+endef
+
+$(eval $(call KernelPackage,rpmsg))
+
+
+define KernelPackage/rpmsg-irq
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=RPMSG irq driver
+  DEPENDS:=@TARGET_stm32_stm32mp2 +kmod-rpmsg
+  KCONFIG:=CONFIG_RPMSG_IRQ
+  FILES:=$(LINUX_DIR)/drivers/irqchip/irq-rpmsg.ko
+  AUTOLOAD:=$(call AutoProbe,irq-rpmsg)
+endef
+
+$(eval $(call KernelPackage,rpmsg-irq))
+
+
+define KernelPackage/rpmsg-ns
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=RPMSG name service announcement
+  DEPENDS:=@TARGET_stm32_stm32mp2 +kmod-rpmsg
+  KCONFIG:=CONFIG_RPMSG_NS
+  FILES:=$(LINUX_DIR)/drivers/rpmsg/rpmsg_ns.ko
+  AUTOLOAD:=$(call AutoProbe,rpmsg_ns)
+endef
+
+$(eval $(call KernelPackage,rpmsg-ns))
 
 
 define KernelPackage/scmi-hwmon
@@ -525,3 +576,15 @@ define KernelPackage/ucsi-stm32g0
 endef
 
 $(eval $(call KernelPackage,ucsi-stm32g0))
+
+
+define KernelPackage/virtio-rpmsg-bus
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Virtio RPMSG bus driver
+  DEPENDS:=@TARGET_stm32_stm32mp2 +kmod-rpmsg +kmod-rpmsg-ns
+  KCONFIG:=CONFIG_RPMSG_VIRTIO
+  FILES:=$(LINUX_DIR)/drivers/rpmsg/virtio_rpmsg_bus.ko
+  AUTOLOAD:=$(call AutoProbe,virtio_rpmsg_bus)
+endef
+
+$(eval $(call KernelPackage,virtio-rpmsg-bus))
