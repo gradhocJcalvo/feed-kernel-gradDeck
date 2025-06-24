@@ -1,0 +1,107 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2025 Bootlin
+#
+# shellcheck disable=SC2317,SC3043,SC2034,SC2320
+
+START=11
+
+. $IPKG_INSTROOT/lib/functions/procd.sh
+
+validate_section_rproc()
+{
+	uci_load_validate remoteproc rproc "$1" "$2" \
+		'name:string' \
+		'firmware:string' \
+		'disabled:bool:0'
+}
+
+rproc_start()
+{
+	local name
+	local firmware
+        local disabled
+	local ret=0
+	local found=0
+
+	config_get name "$1" name
+	config_get firmware "$1" firmware
+	config_get disabled "$1" disabled 0
+
+	[ -f "$(readlink -f "/lib/firmware/${firmware}")" ] || {
+		echo >&2 "Firmware /lib/firmware/${firmware} does not exists"
+		return 1
+	}
+
+	tmpfile="$(mktemp)" || exit 1
+	find /sys/class/remoteproc/* -type l > "${tmpfile}"
+
+	while IFS= read -r proc; do
+		[ "$(cat "${proc}/name")" = "${name}" ] || continue
+
+		found=1
+
+		[ "${disabled}" -gt 0 ] || {
+
+			echo "${firmware}" > "${proc}/firmware"
+			echo start > "${proc}/state"
+			ret="${?}"
+
+			[ "${ret}" = "0" ] || echo >&2 "Failed to start remoteproc ${name}"
+		}
+
+		break
+	done < "${tmpfile}"
+
+	[ "${found}" = "0" ] && echo >&2 "Failed to find remoteproc ${name}"
+
+	rm -rf "${tmpfile}"
+	return "${ret}"
+}
+
+rproc_stop()
+{
+	local found=0
+	local ret=0
+	local name
+
+	config_get name "$1" name
+
+	tmpfile="$(mktemp)" || exit 1
+	find /sys/class/remoteproc/* -type l > "${tmpfile}"
+
+	while IFS= read -r proc; do
+		[ "$(cat "${proc}/name")" = "${name}" ] || continue
+
+		found=1
+
+		[ "$(cat "${proc}/state")" = "running" ] || break
+
+		echo stop > "${proc}/state"
+		ret="${?}"
+
+		[ "${ret}" = "0" ] || echo >&2 "Failed to stop remoteproc ${name}"
+
+		break
+	done < "${tmpfile}"
+
+	[ "${found}" = "0" ] && echo >&2 "Failed to find remoteproc ${name}"
+
+	rm -rf "${tmpfile}"
+	return "${ret}"
+}
+
+start()
+{
+	[ -e /sys/class/remoteproc/ ] || return
+
+	config_load remoteproc
+	config_foreach validate_section_rproc rproc rproc_start
+}
+
+stop()
+{
+	[ -e /sys/class/remoteproc/ ] || return
+
+	config_load remoteproc
+	config_foreach rproc_stop rproc
+}
