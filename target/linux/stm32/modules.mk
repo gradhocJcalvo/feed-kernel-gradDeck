@@ -116,6 +116,30 @@ endef
 $(eval $(call KernelPackage,phy-stm32-usbphyc))
 
 
+define KernelPackage/remoteproc-srm-core
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Remoteproc System Resource Manager core
+  DEPENDS:=@TARGET_stm32_stm32mp2 +kmod-rpmsg
+  KCONFIG:=CONFIG_REMOTEPROC_SRM_CORE
+  FILES:=$(LINUX_DIR)/drivers/remoteproc/rproc_srm_core.ko
+  AUTOLOAD:=$(call AutoProbe,rproc_srm_core)
+endef
+
+$(eval $(call KernelPackage,remoteproc-srm-core))
+
+
+define KernelPackage/remoteproc-srm-dev
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Remoteproc System Resource Manager device
+  DEPENDS:=@TARGET_stm32_stm32mp2 +kmod-remoteproc-srm-core
+  KCONFIG:=CONFIG_REMOTEPROC_SRM_DEV
+  FILES:=$(LINUX_DIR)/drivers/remoteproc/rproc_srm_dev.ko
+  AUTOLOAD:=$(call AutoProbe,rproc_srm_dev)
+endef
+
+$(eval $(call KernelPackage,remoteproc-srm-dev))
+
+
 define KernelPackage/rpmsg
   TITLE:=Virtio RPMSG bus driver
   DEPENDS:=@TARGET_stm32_stm32mp2
