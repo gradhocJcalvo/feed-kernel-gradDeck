@@ -21,7 +21,13 @@ define Device/Demo-stm32mp2
 		     kmod-stm32-ipcc \
 		     kmod-virtio-rpmsg-bus \
 		     rproc \
-		     stm32-rproc-firmware-stm32mp2-ucsi-$(1)
+		     stm32-rproc-firmware-stm32mp2-ucsi-$(1) \
+		     kmod-rpmsg-irq \
+		     kmod-i2c-rpmsg \
+		     kmod-ucsi-stm32g0 \
+		     kmod-usb3 \
+		     kmod-usb-gadget-ncm \
+		     usbgadget
 endef
 
 define Device/stm32mp157f-dk2-demo
