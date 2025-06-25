@@ -13,6 +13,17 @@ define Device/Demo
   DEVICE_PACKAGES += $(LUCI) $(TESTS)
 endef
 
+define Device/Demo-stm32mp2
+  $(call Device/Demo)
+  DEVICE_PACKAGES += kmod-nvmem-stm32-tamp \
+		     kmod-stm32-rproc \
+		     kmod-stm32-m0-rproc \
+		     kmod-stm32-ipcc \
+		     kmod-virtio-rpmsg-bus \
+		     rproc \
+		     stm32-rproc-firmware-stm32mp2-ucsi-$(1)
+endef
+
 define Device/stm32mp157f-dk2-demo
   $(call Device/stm32mp157f-dk2)
   $(call Device/Demo)
@@ -27,13 +38,13 @@ endef
 
 define Device/stm32mp257f-ev1-demo
   $(call Device/stm32mp257f-ev1)
-  $(call Device/Demo)
+  $(call Device/Demo-stm32mp2,stm32mp257f-ev1)
   DEVICE_NAME := stm32mp257f-ev1
 endef
 
 define Device/stm32mp257f-dk-demo
   $(call Device/stm32mp257f-dk)
-  $(call Device/Demo)
+  $(call Device/Demo-stm32mp2,stm32mp257f-dk)
   DEVICE_NAME := stm32mp257f-dk
 endef
 
