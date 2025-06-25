@@ -54,6 +54,7 @@ Actually the feed is based on OpenWrt
 |Wifi|yes|yes|x|yes|
 |USB Type-A|yes|yes|yes|yes|
 |Remote processors|no|no|yes (demo profile)|yes (demo profile)|
+|USB Type-C|no|no|yes dual-role (demo profile)|yes dual-role (demo profile)|
 
 ## BSP
 
@@ -392,6 +393,7 @@ service rngd restart
 
 * [Using the STM32 Cube Programmer](docs/stm32cubeprogrammer.md)
 * [Using the Remote Processors](docs/remoteproc.md)
+* [Using the USB Type-C](docs/usbc.md)
 * [Using the OpenWrt SDK](docs/sdk.md)
 * [Using the OpenWrt Image Builder](docs/imagebuilder.md)
 * [Using the package repositories](docs/repositories.md)
